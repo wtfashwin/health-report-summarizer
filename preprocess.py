@@ -1,4 +1,5 @@
 # preprocess.py 
+import re
 from typing import List
 import spacy
 nlp = spacy.load("en_core_web_sm")
