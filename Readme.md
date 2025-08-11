@@ -47,7 +47,6 @@ Install dependencies:
 Bash
 
 pip install -r requirements.txt
-(Note: You would need to create a requirements.txt file with all your dependencies).
 
 Running the Application
 Bash
