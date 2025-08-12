@@ -41,7 +41,6 @@ export default function RootLayout({
   )
 }
 
-// Navigation and layout components
 'use client'
 
 import { ChakraProvider, ColorModeScript, extendTheme } from '@chakra-ui/react'
