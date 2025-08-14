@@ -1,45 +1,8 @@
-// app/layout.tsx
 
-import './globals.css'
-import { Metadata } from 'next'
-import { Providers } from './providers'
-
-export const metadata: Metadata = {
-  title: 'Health Report Summarizer | AI-Powered Medical Document Analysis',
-  description: 'Upload and analyze medical reports, diagnostic results, and health documents with AI-powered summarization. Get key insights, detected terms, and structured summaries.',
-  keywords: 'medical reports, health analysis, AI summarization, diagnostic reports, healthcare AI',
-  authors: [{ name: 'Health Report Summarizer' }],
-  robots: 'index, follow',
-  openGraph: {
-    title: 'Health Report Summarizer',
-    description: 'AI-powered medical document analysis and summarization',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Health Report Summarizer',
-    description: 'AI-powered medical document analysis and summarization',
-  }
-}
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head />
-      <body>
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-    </html>
-  )
-}
+'use client'
 
 import { ChakraProvider } from '@chakra-ui/react'
+import { extendTheme } from '@chakra-ui/theme'
 import { 
   Box, 
   Container, 
@@ -47,7 +10,6 @@ import {
   Heading, 
   Text, 
   Button,
-  ColorMode,
   IconButton,
   HStack,
   Spacer
@@ -88,20 +50,21 @@ const theme = extendTheme({
   },
 })
 
-function ProvidersComponent({ children }: { children: React.ReactNode }) {
+// Chakra providers wrapper with app shell
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ChakraProvider theme={theme}>
-        {children}
+        <AppShell>
+          {children}
+        </AppShell>
       </ChakraProvider>
     </>
   )
 }
 
-export { ProvidersComponent as Providers }
-
-// Navigation and layout shell
+// Main app shell with navigation
 function AppShell({ children }: { children: React.ReactNode }) {
   const { colorMode, toggleColorMode } = useColorMode()
   const [showHistory, setShowHistory] = useState(false)
@@ -109,7 +72,9 @@ function AppShell({ children }: { children: React.ReactNode }) {
   const handleHistoryToggle = () => {
     setShowHistory(!showHistory)
     // Dispatch custom event for page.tsx to listen to
-    window.dispatchEvent(new CustomEvent('toggleHistory', { detail: !showHistory }))
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('toggleHistory', { detail: !showHistory }))
+    }
   }
 
   return (
