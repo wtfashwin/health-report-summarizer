@@ -1,66 +1,55 @@
-Healthcare Report Summarizer
-Project Description
-This project is a lightweight, offline-friendly tool that automates the summarization of raw medical reports. It takes an unstructured medical report (PDF or text) as input and generates a concise, patient-friendly summary. The goal is to demystify complex medical terminology, making it easier for patients to understand their diagnosis, key findings, and recommended next steps, and for doctors to quickly review key information.
+# Health Report Summarizer
 
-Features
-PDF & Text Extraction: Seamlessly extracts text from various medical report formats using PyMuPDF and pdfplumber.
+Health Report Summarizer is a Python prototype for turning report PDFs into shorter text, with a separate unfinished web interface.
 
-NLP-Powered Summarization: Utilizes a pre-trained Hugging Face transformer model to generate accurate and relevant summaries.
+## What it does
 
-Medical Term Simplification: Includes a custom layer to simplify complex medical jargon (e.g., "hypertension" to "high blood pressure") for enhanced readability.
+- Extracts PDF text with PyMuPDF, with OCR through Tesseract for empty pages.
+- Cleans and splits text, ranks sentences with TF-IDF, and groups them into chunks.
+- Summarizes chunks with the Hugging Face `sshleifer/distilbart-cnn-12-6` model.
+- Caches summaries in SQLite and writes Markdown and JSON outputs.
+- Includes a separate batch script for PDF folders and CSV files with a `Report` column.
 
-Interactive UI: A user-friendly interface built with Streamlit allows for easy report uploads and side-by-side comparison of the original text and the generated summary.
+## Python setup and usage
 
-Offline Capability: The entire application runs locally, ensuring data privacy and security without needing an internet connection.
+No Python dependency file is included. The source requires PyMuPDF, pdfplumber, pytesseract, Pillow, spaCy, scikit-learn, transformers, a supported model runtime such as PyTorch, tqdm, and pandas. Scanned PDFs also require the Tesseract executable installed on your system. Compatible package versions have not been established in this repository.
 
-Why this Project is Valuable
-Demonstrates Advanced NLP Skills: Showcases proficiency in text processing, information extraction, and abstractive summarization.
+In an environment with those dependencies installed, download the spaCy model and run the single-PDF entry point from the repository root:
 
-Solves a Real-World Problem: Addresses a critical communication gap in the healthcare industry, highlighting the practical impact of AI.
+```bash
+python -m spacy download en_core_web_sm
+python backend/pipeline_run.py "path/to/report.pdf"
+```
 
-Relevant for the AI/Healthcare Domain: Positions the developer as a candidate with a strong understanding of a high-growth, high-impact field.
+Replace the path with a PDF you are authorized to process. Model weights may need downloading on first use. The command creates `cache.db` and `outputs/` in the current working directory. Repeated document text can reuse cached results.
 
-How to Use
-Prerequisites
-Python 3.x
+For batch processing, `backend/summarizer.py` also handles PDF folders and a CSV `Report` column, but its `dataset_root` is an author-specific Windows path that must be changed before use.
 
-A C++ compiler (for some dependencies, especially on Windows). See this guide for help with installation.
+## Web interface
 
-Installation
-Clone the repository:
+`frontend/` contains Next.js, React, TypeScript, and Chakra UI code. Its package scripts are:
 
-Bash
+```bash
+cd frontend
+npm install
+npm run dev
+npm run build
+```
 
-git clone https://github.com/your-username/health-report-summarizer.git
-cd health-report-summarizer
-Set up a virtual environment:
+These are defined commands, not a verified working web setup. The page expects `http://localhost:5000/upload` and `/api/history`, neither of which is implemented in the captured source. The UI also contains mock history results and missing imports/dependencies, including Chakra icons and theme components. It needs repair before integration.
 
-Bash
+## Project structure
 
-python -m venv .venv
-# On Windows
-.venv\Scripts\activate
-# On macOS/Linux
-source .venv/bin/activate
-Install dependencies:
+- `backend/pipeline_run.py` — single-PDF processing entry point.
+- `backend/pdf_extract.py`, `preprocess.py`, `scoring.py`, `chunker.py` — text preparation.
+- `backend/summarizer.py`, `storage.py` — model inference, batch processing, and caching.
+- `frontend/` — unfinished upload/history interface.
+- `dataset/` — checked-in PDF and CSV data; source provenance is not documented.
 
-Bash
+## Status and limitations
 
-pip install -r requirements.txt
+This is a prototype with no automated test suite or clinically validated results. The model is a general summarizer; medical-term replacement is not implemented. Generated text can omit or change findings, so retain and check the original report. Cached summaries are stored locally without encryption or access controls in this code.
 
-Running the Application
-Bash
+## License
 
-streamlit run app.py
-
-Project Roadmap
-
-Phase 1: Setup & Data
-
-Phase 2: PDF to Text
-
-Phase 3: Summarization Model
-
-Phase 4: Healthcare Optimization
-
-Phase 5: User Interface
+No license file is included. Dataset reuse terms are not specified.
